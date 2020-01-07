@@ -51,7 +51,7 @@ class opts():
         self.output_dir = 'output'
         self.submission = 'submission'
         self.visual = 'visualization'
-        self.test_date = '2019-01-02'
+        self.test_date = '2020-01-02'
         self.test_file = 'model_epoch_last.pth'
         self.snapshot = True
         self.use_TTA = False
