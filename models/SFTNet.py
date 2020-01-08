@@ -377,7 +377,7 @@ class SFT_unit(nn.Module):
         self.delta = ConvND(in_c, in_c, 1)
         self.Ws = ConvND(in_c, in_c, 1)
         self.xi = ConvND(in_c, in_c, 1)
-        self.sigmoid = nn.Sigmoid()
+        self.softmax = nn.Softmax(-1)
 
         self.phi_f = ConvND(in_channels=in_c, out_channels=self.state_f, kernel_size=1)
         self.theta_f = ConvND(in_channels=in_c, out_channels=self.node_f, kernel_size=1)
@@ -404,7 +404,7 @@ class SFT_unit(nn.Module):
         #(b, h, c, w, d)-->(b, h, w, c, d)-->(b, hw//4, cd//2)
         v = self.v(Hs.permute(0, 3, 1, 2, 4)).permute(0, 1, 3, 2, 4).contiguous().view(b, h*w//4, -1)
         #(b, w, c, h, d)-->(b, w, h, c, d)-->(b, hw//4, cd//2)
-        A = self.sigmoid(torch.matmul(v, phi_s.permute(0, 2, 1)))  #(b, hw//4, hw//4)
+        A = self.softmax(torch.matmul(v, phi_s.permute(0, 2, 1)))  #(b, hw//4, hw//4)
         delta = self.delta(Hs).view(b, c*d//2, -1)  #(b, c, h//2, w//2, d//2)-->(b, cd//2, hw//4)
         AVs = torch.matmul(delta, A).view(b, c, d//2, h//2, w//2).permute(0, 1, 3, 4, 2).contiguous()  #(b, cd//2, hw//4)-->(b, c, h//2, w//2, d//2)
         Ws = self.Ws(AVs) #(b, c, h, w, d)
